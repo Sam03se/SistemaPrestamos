@@ -25,7 +25,7 @@ class Prestamo implements Comparable<Prestamo> {
 
     @Override
     public int compareTo(Prestamo otro) {
-        return Double.compare(otro.monto, this.monto); // mayor monto = mayor prioridad
+        return Double.compare(otro.monto, this.monto);
     }
 }
 
@@ -53,7 +53,7 @@ public class SistemaPrestamosEstructuras {
             System.out.println("7. Salir");
             System.out.print("Opción: ");
             opcion = sc.nextInt();
-            sc.nextLine(); // Limpiar buffer
+            sc.nextLine();
 
             switch (opcion) {
                 case 1 -> crearCliente();
@@ -116,7 +116,7 @@ public class SistemaPrestamosEstructuras {
 
     static void aprobarPrestamo() {
         if (colaSolicitudes.isEmpty()) {
-            System.out.println("⚠ No hay solicitudes pendientes.");
+            System.out.println("No hay solicitudes pendientes.");
             return;
         }
         Prestamo p = colaSolicitudes.poll();
@@ -127,7 +127,7 @@ public class SistemaPrestamosEstructuras {
 
     static void mostrarPrestamosPrioridad() {
         if (colaPrioridad.isEmpty()) {
-            System.out.println("⚠ No hay préstamos aprobados.");
+            System.out.println("No hay préstamos aprobados.");
             return;
         }
         System.out.println("Préstamos aprobados (ordenados por monto):");
