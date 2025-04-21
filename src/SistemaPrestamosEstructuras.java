@@ -122,7 +122,7 @@ public class SistemaPrestamosEstructuras {
         Prestamo p = colaSolicitudes.poll();
         colaPrioridad.add(p);
         historial.push("Préstamo aprobado: $" + p.monto + " para " + p.destino);
-        System.out.println("🟢 Préstamo aprobado y enviado a cola priorizada.");
+        System.out.println("Préstamo aprobado y enviado a cola priorizada.");
     }
 
     static void mostrarPrestamosPrioridad() {
