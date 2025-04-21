@@ -25,53 +25,132 @@ class Prestamo implements Comparable<Prestamo> {
 
     @Override
     public int compareTo(Prestamo otro) {
-        // Prioridad: monto mayor tiene más prioridad
-        return Double.compare(otro.monto, this.monto);
+        return Double.compare(otro.monto, this.monto); // mayor monto = mayor prioridad
     }
 }
 
 public class SistemaPrestamosEstructuras {
+
     static ArrayList<Cliente> clientes = new ArrayList<>();
     static Queue<Prestamo> colaSolicitudes = new LinkedList<>();
     static Stack<String> historial = new Stack<>();
     static PriorityQueue<Prestamo> colaPrioridad = new PriorityQueue<>();
 
+    static Scanner sc = new Scanner(System.in);
+    static int idClienteCounter = 1;
+    static int idPrestamoCounter = 1;
+
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+        int opcion;
+        do {
+            System.out.println("\n======= MENÚ DE PRÉSTAMOS =======");
+            System.out.println("1. Crear cliente");
+            System.out.println("2. Mostrar clientes");
+            System.out.println("3. Solicitar préstamo");
+            System.out.println("4. Aprobar préstamo");
+            System.out.println("5. Mostrar préstamos priorizados");
+            System.out.println("6. Mostrar historial");
+            System.out.println("7. Salir");
+            System.out.print("Opción: ");
+            opcion = sc.nextInt();
+            sc.nextLine(); // Limpiar buffer
 
-        // Crear cliente sencillo
-        Cliente c1 = new Cliente(1, "Dome");
-        clientes.add(c1);
-        historial.push("Cliente creado: " + c1.nombre);
+            switch (opcion) {
+                case 1 -> crearCliente();
+                case 2 -> mostrarClientes();
+                case 3 -> solicitarPrestamo();
+                case 4 -> aprobarPrestamo();
+                case 5 -> mostrarPrestamosPrioridad();
+                case 6 -> mostrarHistorial();
+                case 7 -> System.out.println("Cerrando sistema...");
+                default -> System.out.println("Opción inválida.");
+            }
+        } while (opcion != 7);
+    }
 
-        // Crear préstamo (agregado a la cola normal)
-        Prestamo p1 = new Prestamo(1, 1, 5000, "Estudios");
-        colaSolicitudes.add(p1);
-        historial.push("Solicitud agregada a cola: " + p1.destino + " $" + p1.monto);
+    static void crearCliente() {
+        System.out.print("Nombre del cliente: ");
+        String nombre = sc.nextLine();
+        Cliente c = new Cliente(idClienteCounter++, nombre);
+        clientes.add(c);
+        historial.push("Cliente creado: " + nombre);
+        System.out.println("Cliente registrado.");
+    }
 
-        // Aprobar solicitud (de cola normal a cola de prioridad)
-        Prestamo aprobado = colaSolicitudes.poll();
-        if (aprobado != null) {
-            colaPrioridad.add(aprobado);
-            historial.push("Préstamo aprobado y enviado a cola priorizada");
+    static void mostrarClientes() {
+        if (clientes.isEmpty()) {
+            System.out.println("No hay clientes registrados.");
+            return;
+        }
+        System.out.println("Lista de clientes:");
+        for (Cliente c : clientes) {
+            System.out.println("ID: " + c.id + " | Nombre: " + c.nombre);
+        }
+    }
+
+    static void solicitarPrestamo() {
+        if (clientes.isEmpty()) {
+            System.out.println("Primero debes registrar al menos un cliente.");
+            return;
+        }
+        System.out.print("ID del cliente: ");
+        int idCliente = sc.nextInt();
+        sc.nextLine();
+        Cliente c = buscarCliente(idCliente);
+        if (c == null) {
+            System.out.println("Cliente no encontrado.");
+            return;
         }
 
-        // Mostrar cola de prioridad
-        System.out.println("📝 Préstamos priorizados por monto:");
+        System.out.print("Monto solicitado: ");
+        double monto = sc.nextDouble();
+        sc.nextLine();
+        System.out.print("Destino del préstamo: ");
+        String destino = sc.nextLine();
+
+        Prestamo p = new Prestamo(idPrestamoCounter++, idCliente, monto, destino);
+        colaSolicitudes.add(p);
+        historial.push("Solicitud agregada: $" + monto + " para " + destino);
+        System.out.println("Solicitud registrada.");
+    }
+
+    static void aprobarPrestamo() {
+        if (colaSolicitudes.isEmpty()) {
+            System.out.println("⚠ No hay solicitudes pendientes.");
+            return;
+        }
+        Prestamo p = colaSolicitudes.poll();
+        colaPrioridad.add(p);
+        historial.push("Préstamo aprobado: $" + p.monto + " para " + p.destino);
+        System.out.println("🟢 Préstamo aprobado y enviado a cola priorizada.");
+    }
+
+    static void mostrarPrestamosPrioridad() {
+        if (colaPrioridad.isEmpty()) {
+            System.out.println("⚠ No hay préstamos aprobados.");
+            return;
+        }
+        System.out.println("Préstamos aprobados (ordenados por monto):");
         for (Prestamo p : colaPrioridad) {
-            System.out.println("Préstamo #" + p.id + " | Cliente: " + p.idCliente + " | $" + p.monto + " | Destino: " + p.destino);
+            System.out.println("Cliente ID: " + p.idCliente + " | Monto: $" + p.monto + " | Destino: " + p.destino);
         }
+    }
 
-        // Mostrar historial de operaciones (último al primero)
-        System.out.println("\n📚 Historial de operaciones:");
+    static void mostrarHistorial() {
+        if (historial.isEmpty()) {
+            System.out.println("Historial vacío.");
+            return;
+        }
+        System.out.println("Historial de operaciones:");
         while (!historial.isEmpty()) {
             System.out.println(historial.pop());
         }
     }
-}
-//TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+
+    static Cliente buscarCliente(int id) {
+        for (Cliente c : clientes) {
+            if (c.id == id) return c;
         }
+        return null;
     }
 }
